@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Octopus — EspAudio example</title>
+  <meta name="description" content="Public simplified Octopus: 8 beams, 8 voices, 8 scales, 8 effects, 8 presets. Live harp only.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Octopus</h1>
+    <p class="tag">EspAudio public example · live harp · 8 beams · 8 voices</p>
+  </header>
+
+  <p class="honesty">Browser demo — not 83 kHz ADC DMA, not the commercial Octopus PRO XL. Full synth / 128 banks / groovebox live in <a href="https://stream.isystem.app/">CraftAudio</a> (credits / subscription). Detector course: <a href="https://github.com/iSystemDevelopment/octopus-laser-harp-lab">octopus-laser-harp-lab</a>.</p>
+
+  <section class="controls">
+    <label>Scale
+      <select id="scale"></select>
+    </label>
+    <label>Preset
+      <select id="preset"></select>
+    </label>
+    <label>Effect
+      <select id="fx"></select>
+    </label>
+    <label>FX amount
+      <input id="fxAmt" type="range" min="0" max="100" value="35">
+    </label>
+    <label>D-BEAM → CC1 Modulation
+      <input id="dbeam" type="range" min="0" max="127" value="0">
+    </label>
+    <span id="cc1out" class="cc1">CC1 0</span>
+    <button type="button" id="start">Start audio</button>
+  </section>
+
+  <p class="hint">Break a beam: click / touch a string, or keys <kbd>1</kbd>–<kbd>8</kbd>. Analog D-BEAM is <strong>CC1 Modulation</strong> only (vibrato). Digital = trigger. Cutoff / volume / Kalman routes stay in CraftAudio.</p>
+
+  <div id="stage" aria-label="Eight laser strings">
+    <div class="beam" data-i="0"><span>1</span></div>
+    <div class="beam" data-i="1"><span>2</span></div>
+    <div class="beam" data-i="2"><span>3</span></div>
+    <div class="beam" data-i="3"><span>4</span></div>
+    <div class="beam" data-i="4"><span>5</span></div>
+    <div class="beam" data-i="5"><span>6</span></div>
+    <div class="beam" data-i="6"><span>7</span></div>
+    <div class="beam" data-i="7"><span>8</span></div>
+  </div>
+
+  <footer>
+    MIT · DIODAC / iSystem · library: <a href="https://github.com/iSystemDevelopment/esp_audio">esp_audio</a>
+  </footer>
+  <script src="wt8.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

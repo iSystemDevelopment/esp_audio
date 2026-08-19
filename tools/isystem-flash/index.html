@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>iSystem flash tool — EspAudio</title>
+  <meta name="description" content="Flash a local ESP32 firmware .bin over WebSerial. No cloud, no keys.">
+  <style>
+    :root { color-scheme: dark; --bg:#0b0c10; --fg:#e8e6e3; --mut:#9aa0a6; --acc:#7fd1e0; }
+    body { margin: 0; font: 16px/1.45 system-ui, sans-serif; background: var(--bg); color: var(--fg); }
+    main { max-width: 40rem; margin: 0 auto; padding: 1.5rem; }
+    h1 { font-size: 1.35rem; }
+    .mut { color: var(--mut); }
+    button, input[type=file] { font: inherit; }
+    button { background: #1e3a4c; color: var(--fg); border: 1px solid var(--acc); border-radius: 6px; padding: .45rem .9rem; cursor: pointer; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    pre { background: #111318; padding: .75rem; border-radius: 6px; min-height: 8rem; overflow: auto; white-space: pre-wrap; }
+    label { display: block; margin: .8rem 0 .3rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>iSystem flash tool</h1>
+    <p class="mut">Chrome / Edge · WebSerial. Pick a <strong>local</strong> <code>.bin</code> you built with Arduino or PlatformIO. Nothing is uploaded.</p>
+    <p><button type="button" id="connect">Connect serial</button></p>
+    <label>Firmware <code>.bin</code>
+      <input id="bin" type="file" accept=".bin,application/octet-stream">
+    </label>
+    <p><button type="button" id="flash" disabled>Flash</button></p>
+    <pre id="log">Ready.</pre>
+    <p class="mut">Repo: <a href="https://github.com/iSystemDevelopment/esp_audio">esp_audio</a> · build notes in this folder’s README.</p>
+  </main>
+  <script type="module">
+    import { ESPLoader, Transport } from "https://unpkg.com/esptool-js@0.5.5/bundle.js";
+
+    const logEl = document.getElementById("log");
+    const flashBtn = document.getElementById("flash");
+    let port = null;
+    let transport = null;
+
+    function log(line) {
+      logEl.textContent += "\n" + line;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    document.getElementById("connect").onclick = async () => {
+      if (!navigator.serial) {
+        log("WebSerial missing — use Chrome or Edge on desktop.");
+        return;
+      }
+      try {
+        port = await navigator.serial.requestPort();
+        log("Port selected.");
+        flashBtn.disabled = false;
+      } catch (e) {
+        log("Connect cancelled: " + (e && e.message ? e.message : e));
+      }
+    };
+
+    document.getElementById("flash").onclick = async () => {
+      const file = document.getElementById("bin").files[0];
+      if (!port || !file) {
+        log("Need a serial port and a .bin file.");
+        return;
+      }
+      flashBtn.disabled = true;
+      try {
+        await port.open({ baudRate: 115200 });
+        transport = new Transport(port, true);
+        const loader = new ESPLoader({
+          transport,
+          baudrate: 115200,
+          terminal: { clean() {}, writeLine(d) { log(d); }, write(d) { log(d); } }
+        });
+        await loader.main();
+        const buf = await file.arrayBuffer();
+        const u8 = new Uint8Array(buf);
+        let binary = "";
+        for (let i = 0; i < u8.length; i++) binary += String.fromCharCode(u8[i]);
+        await loader.writeFlash({
+          fileArray: [{ data: binary, address: 0 }],
+          flashSize: "keep",
+          flashMode: "keep",
+          flashFreq: "keep",
+          eraseAll: false,
+          compress: true
+        });
+        log("Flash done. Reset the board.");
+      } catch (e) {
+        log("Flash failed: " + (e && e.message ? e.message : e));
+      } finally {
+        try { if (transport) await transport.disconnect(); } catch (_) {}
+        flashBtn.disabled = false;
+      }
+    };
+  </script>
+</body>
+</html>

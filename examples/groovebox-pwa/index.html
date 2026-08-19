@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Example Groovebox — EspAudio</title>
+  <meta name="description" content="Public MIT 4 synth + 4 drum step box. Not Octopus AB 9-09.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Example Groovebox</h1>
+    <p class="tag">4 synth · 4 drum · 16 steps · original MIT demo</p>
+  </header>
+  <p class="honesty">Not the commercial AB 9-09 / 8+8 Pro groovebox (that stays in <a href="https://stream.isystem.app/">CraftAudio</a>). Empty steps and gate-off voices stay silent.</p>
+  <p>
+    <button type="button" id="start">Start audio</button>
+    <label>BPM <input id="bpm" type="number" min="60" max="180" value="120"></label>
+    <button type="button" id="play">Play</button>
+  </p>
+  <div id="grid"></div>
+  <p class="mut">Keys 1–4 = synths · 5–8 = drums (preview while stopped).</p>
+  <script src="app.js"></script>
+</body>
+</html>
