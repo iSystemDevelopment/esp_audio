@@ -1,7 +1,7 @@
 {
   "name": "EspAudio",
-  "version": "0.4.0",
-  "description": "Teensy-Audio-style DSP helpers for ESP32-S3/P4 plus a simplified Octopus harp example. Public MIT subset — not commercial Octopus ROM.",
+  "version": "0.5.0",
+  "description": "Teensy-Audio-style DSP helpers for ESP32-S3/P4, plus AudioStreamGraph — a runtime that renders a CraftAudio patch as DATA, and AudioStreamControl — patch-generic live param writes over SysEx (bring your own isystem_dsp_kernels.h). Public MIT subset — not commercial Octopus ROM. AudioGranularOla is caller-PCM only (no SD WAV decoder).",
   "keywords": "esp32, audio, dsp, harp, wavetable",
   "repository": {
     "type": "git",
@@ -16,7 +16,7 @@
   "license": "MIT",
   "frameworks": "arduino",
   "platforms": "espressif32",
-  "headers": ["EspAudio.h", "AudioAnalyzeAdc.h", "AudioDbeamCc1.h", "AudioSynthWavetable8.h", "AudioSynthHarp8.h", "AudioEffectBasic8.h", "AudioButtonGpio.h", "AudioMidiUsb.h", "AudioOutputI2S.h"],
+  "headers": ["EspAudio.h", "AudioStreamGraph.h", "AudioStreamPatch.h", "AudioStreamControl.h", "AudioCodec.h", "AudioCodecES8388.h", "AudioAnalyzeAdc.h", "AudioDbeamCc1.h", "AudioSynthWavetable8.h", "AudioSynthHarp8.h", "AudioEffectBasic8.h", "AudioGranularOla.h", "AudioButtonGpio.h", "AudioMidiUsb.h", "AudioOutputI2S.h"],
   "build": {
     "includeDir": "include",
     "srcDir": "src"

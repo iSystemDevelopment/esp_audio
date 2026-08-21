@@ -29,6 +29,6 @@ Lab carrier **~7.8 kHz**. Do not copy product firmware.
 
 ## What is original MIT vs forbidden
 
-**Here:** generated 8-cycle wavetables, 8 presets, 8 scales, simple harp, 8 insert FX, ADC → CC1, DIY GPIO button, USB-MIDI CC packer, DIY I2S master out (you pick pins).
+**Here:** generated 8-cycle wavetables, 8 presets, 8 scales, simple harp, 8 insert FX, grain OLA on caller PCM (`AudioGranularOla`), ADC → CC1, DIY GPIO button, USB-MIDI CC packer, DIY I2S master out (you pick pins). No SD WAV decoder.
 
 **Not here:** product SOUND_BANK 128, commercial ROM, `laser.cpp`, photodiode latch, `harp.cpp`, `dbeam.cpp`, AB 9-09, sequencer, extended mixers, PRO D-BEAM expression, Octopus 201-cmd SysEx (`0x7C`/`0x7D`), Octopus I2S pin map / `audio_synthesis_task`.

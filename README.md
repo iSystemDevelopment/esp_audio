@@ -63,8 +63,12 @@ Lab carrier **~7.8 kHz**. Commercial hardware may differ — design to the lab n
 | `AudioSynthWavetable8` | **8 original** tables + **8 presets** (not product ROM) |
 | `AudioSynthHarp8` | 8 voices · 8 scales · AR env · CC1 vibrato |
 | `AudioEffectBasic8` | Bypass, LPF, Delay, Chorus, Distort, Tremolo, Crush, Room |
+| `AudioGranularOla` | Grain OLA on **your** float PCM (Flex + crystal reverse). **No** SD WAV reader / `AudioPlaySdWav` |
 | `AudioButtonGpio` | DIY debounced GPIO button — you pick the pin |
 | `AudioMidiUsb` | DIY USB-MIDI **CC / Note** 4-byte packer (you wire TinyUSB) |
+| `AudioStreamGraph` | Runtime that renders a CraftAudio patch as **data** — no per-patch compile. Bring your own `isystem_dsp_kernels.h` |
+| `AudioStreamPatch` | Loader: `kind: isystem-stream` JSON → node/edge arrays. No dependencies |
+| `AudioStreamControl` | Live param writes over SysEx, patch-generic. One wire format for the web desk, a local panel and any controller |
 | `AudioOutputI2S` | DIY I2S master out — **you pick** BCLK/WS/DOUT (defaults 7/8/9). Philips 16 stereo. TRS Tip L / Ring R / Sleeve GND after *your* DAC |
 | I2S graph runner | Partial — `AudioOutputI2S` shipped; Teensy-shaped `AudioConnection` for every catalog node later |
 
