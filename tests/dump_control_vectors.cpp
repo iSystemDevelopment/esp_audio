@@ -60,14 +60,25 @@ int main() {
   }
 
   /* The slot table, so JS cannot drift from the loader's own names. */
+  /* Every kind with slots. Keep this list complete: the JS side asserts it
+     saw one SLOTS line per entry in its own table, so a kind added to the
+     runtime and forgotten here fails the cross-check instead of quietly
+     dropping out of it. */
   const AudioStreamNodeKind kinds[] = {
     AUDIO_STREAM_NODE_OSCILLATOR, AUDIO_STREAM_NODE_FILTER,
     AUDIO_STREAM_NODE_DELAY, AUDIO_STREAM_NODE_DISTORTION,
-    AUDIO_STREAM_NODE_GAIN
+    AUDIO_STREAM_NODE_GAIN, AUDIO_STREAM_NODE_RING_MOD,
+    AUDIO_STREAM_NODE_COMPRESSOR, AUDIO_STREAM_NODE_EQ,
+    AUDIO_STREAM_NODE_CRYSTALIZER, AUDIO_STREAM_NODE_CHORUS,
+    AUDIO_STREAM_NODE_FLANGE, AUDIO_STREAM_NODE_MAXIMIZER,
+    AUDIO_STREAM_NODE_PITCH_SHIFT
   };
   const char *type_of[] = {
     "isystem-dsp-oscillator", "isystem-dsp-filter", "isystem-dsp-delay",
-    "isystem-dsp-distortion", "isystem-dsp-gain"
+    "isystem-dsp-distortion", "isystem-dsp-gain", "isystem-dsp-ring-mod",
+    "isystem-dsp-compressor", "isystem-dsp-eq", "isystem-dsp-crystalizer",
+    "isystem-dsp-chorus", "isystem-dsp-flange", "isystem-dsp-maximizer",
+    "isystem-dsp-pitch-shift"
   };
   for (size_t k = 0; k < sizeof(kinds) / sizeof(kinds[0]); ++k) {
     std::printf("SLOTS %s", type_of[k]);
