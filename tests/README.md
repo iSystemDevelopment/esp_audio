@@ -77,10 +77,22 @@ modules being reported rather than approximated; a pass-through returning the
 **sum** of its inputs, so an unported mixer behaves as a unity-gain summing
 mixer; gain and mute; cycle safety; output bounds; null and empty input.
 
-**Not covered — and this matters:** numeric agreement with the browser preview.
-The kernels are shared, but "same kernels" is not "same output" until it is
-measured. That JS↔C++ cross-check is a separate gate and no claim of parity
-should be made until it has been run.
+**Numeric agreement with the browser — RUN 2026-08-21, and it passes for the
+ported kinds.** `dump_graph_vectors.cpp` prints what this runtime renders for
+seven vectors; `platform/isystem-builder/smoke-graph-parity.mjs` in the private
+monorepo drives the browser's own kernels over the identical input and diffs
+them. Filter, distortion, oscillator and a whole osc → filter → gain → out graph
+all agree to an RMS ratio within 1e-6.
+
+Read the two figures differently. **RMS ratio** proves the logic matches — a
+different topology, a missing clamp or a wrong coefficient moves energy. **Max
+|Δ|** only reflects float32 against float64 and is reported, not gated: on a saw
+it reaches 4e-4 because a discontinuity turns a tiny phase difference into a
+large single-sample one, while the RMS still agrees to 1.8e-8.
+
+**Still not covered:** `IsDelay` — the JS side has a ModDelay, not a plain
+delay, so there is nothing to compare it against yet. And everything that is not
+one of the six native kinds, because it passes through.
 
 Also not covered here: I2S, USB-MIDI, and anything requiring hardware.
 

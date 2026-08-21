@@ -28,6 +28,12 @@ cl /nologo /std:c++17 /EHsc /I include /I build ^
    /Fo:build\ /Fe:build\test_stream_control.exe >nul || goto :fail
 build\test_stream_control.exe || goto :fail
 
+if exist tests\dump_graph_vectors.cpp (
+  cl /nologo /std:c++17 /EHsc /I include /I build ^
+     tests\dump_graph_vectors.cpp src\AudioStreamGraph.cpp ^
+     /Fo:build\ /Fe:build\dump_graph_vectors.exe >nul || goto :fail
+)
+
 if exist tests\dump_control_vectors.cpp (
   cl /nologo /std:c++17 /EHsc /I include /I build ^
      tests\dump_control_vectors.cpp src\AudioStreamControl.cpp ^
