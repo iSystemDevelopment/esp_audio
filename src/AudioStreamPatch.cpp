@@ -134,6 +134,37 @@ const ParamSlot kDistSlots[] = {
 const ParamSlot kGainSlots[] = {
   { "gain", AUDIO_STREAM_GAIN_GAIN }, { "mute", AUDIO_STREAM_GAIN_MUTE }, { 0, 0 }
 };
+const ParamSlot kRingSlots[] = {
+  { "carrier", AUDIO_STREAM_RING_CARRIER }, { "mix", AUDIO_STREAM_RING_MIX }, { 0, 0 }
+};
+const ParamSlot kCompSlots[] = {
+  { "threshold", AUDIO_STREAM_COMP_THRESHOLD }, { "ratio", AUDIO_STREAM_COMP_RATIO },
+  { "attack", AUDIO_STREAM_COMP_ATTACK },       { "release", AUDIO_STREAM_COMP_RELEASE },
+  { 0, 0 }
+};
+const ParamSlot kEqSlots[] = {
+  { "low", AUDIO_STREAM_EQ_LOW }, { "mid", AUDIO_STREAM_EQ_MID },
+  { "high", AUDIO_STREAM_EQ_HIGH }, { 0, 0 }
+};
+const ParamSlot kModSlots[] = {
+  { "rate", AUDIO_STREAM_MOD_RATE }, { "depth", AUDIO_STREAM_MOD_DEPTH },
+  { "feedback", AUDIO_STREAM_MOD_FEEDBACK }, { "wet", AUDIO_STREAM_MOD_WET },
+  { 0, 0 }
+};
+const ParamSlot kMaximSlots[] = {
+  { "boost", AUDIO_STREAM_MAXIM_BOOST },     { "ceiling", AUDIO_STREAM_MAXIM_CEILING },
+  { "soft", AUDIO_STREAM_MAXIM_SOFT },       { "lookahead", AUDIO_STREAM_MAXIM_LOOKAHEAD },
+  { "release", AUDIO_STREAM_MAXIM_RELEASE }, { "output", AUDIO_STREAM_MAXIM_OUTPUT },
+  { 0, 0 }
+};
+const ParamSlot kPitchSlots[] = {
+  { "pitch", AUDIO_STREAM_PITCH_PITCH }, { "mix", AUDIO_STREAM_PITCH_MIX }, { 0, 0 }
+};
+const ParamSlot kCrystalSlots[] = {
+  { "clarity", AUDIO_STREAM_CRYSTAL_CLARITY }, { "focus", AUDIO_STREAM_CRYSTAL_FOCUS },
+  { "sparkle", AUDIO_STREAM_CRYSTAL_SPARKLE }, { "separate", AUDIO_STREAM_CRYSTAL_SEPARATE },
+  { "mix", AUDIO_STREAM_CRYSTAL_MIX },         { 0, 0 }
+};
 
 const ParamSlot *slots_for(AudioStreamNodeKind k) {
   switch (k) {
@@ -142,6 +173,14 @@ const ParamSlot *slots_for(AudioStreamNodeKind k) {
     case AUDIO_STREAM_NODE_DELAY:      return kDelaySlots;
     case AUDIO_STREAM_NODE_DISTORTION: return kDistSlots;
     case AUDIO_STREAM_NODE_GAIN:       return kGainSlots;
+    case AUDIO_STREAM_NODE_RING_MOD:   return kRingSlots;
+    case AUDIO_STREAM_NODE_COMPRESSOR: return kCompSlots;
+    case AUDIO_STREAM_NODE_EQ:         return kEqSlots;
+    case AUDIO_STREAM_NODE_CRYSTALIZER: return kCrystalSlots;
+    case AUDIO_STREAM_NODE_CHORUS:
+    case AUDIO_STREAM_NODE_FLANGE:     return kModSlots;
+    case AUDIO_STREAM_NODE_MAXIMIZER:  return kMaximSlots;
+    case AUDIO_STREAM_NODE_PITCH_SHIFT: return kPitchSlots;
     default: return 0;
   }
 }

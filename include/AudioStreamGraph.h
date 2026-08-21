@@ -23,7 +23,21 @@
  *
  *  ── What it will and will not run ───────────────────────────────────────────
  *  Rendered natively: oscillator · filter · delay · distortion · gain ·
- *  audio-out.
+ *  ring-mod · compressor · eq · crystalizer · chorus · flange · maximizer ·
+ *  pitch-shift · audio-out.
+ *
+ *  ── Memory ─────────────────────────────────────────────────────────────────
+ *  The five kernels that own a buffer (delay, chorus, flange, maximizer,
+ *  pitch-shift) are allocated per node ONLY when that node is that kind, so a
+ *  node costs what its own kernel costs. Before 2026-08-21 every node carried
+ *  every kernel as a member and a ten-node patch paid ten copies of the
+ *  72000-sample delay line whether or not it had a delay in it.
+ *
+ *  The buffer sizes below are capacity, not tuning: the same kernel gives
+ *  bit-identical output at any size large enough for the sample rate. They
+ *  are sized for 48 kHz. Above that a pitch-shift grain no longer fits and
+ *  the kernel clamps it, which would change the sound silently — so the
+ *  report counts it instead.
  *
  *  Anything else is a PASS-THROUGH: it receives the SUM of its inputs and
  *  returns it unchanged, and is named in the report. Nothing is approximated
@@ -48,6 +62,18 @@
 #ifndef AUDIO_STREAM_GRAPH_DELAY_MAX
 #define AUDIO_STREAM_GRAPH_DELAY_MAX 72000
 #endif
+/** Chorus / flange line: 0.1 s at 48 kHz, the browser kernel’s own window. */
+#ifndef AUDIO_STREAM_GRAPH_MOD_MAX
+#define AUDIO_STREAM_GRAPH_MOD_MAX 4800
+#endif
+/** Maximizer lookahead line: 0.05 s at 48 kHz. */
+#ifndef AUDIO_STREAM_GRAPH_MAXIMIZER_MAX
+#define AUDIO_STREAM_GRAPH_MAXIMIZER_MAX 2400
+#endif
+/** Pitch-shift needs 2*grain+128 with grain = 0.055 s: 5408 at 48 kHz. */
+#ifndef AUDIO_STREAM_GRAPH_PITCH_MAX
+#define AUDIO_STREAM_GRAPH_PITCH_MAX 5504
+#endif
 /** Anti-click gate ramp. A designed control, not an envelope. */
 #ifndef AUDIO_STREAM_GRAPH_GATE_MS
 #define AUDIO_STREAM_GRAPH_GATE_MS 5.0f
@@ -65,6 +91,16 @@ typedef enum {
   AUDIO_STREAM_NODE_DELAY,
   AUDIO_STREAM_NODE_DISTORTION,
   AUDIO_STREAM_NODE_GAIN,
+  AUDIO_STREAM_NODE_RING_MOD,
+  AUDIO_STREAM_NODE_COMPRESSOR,
+  AUDIO_STREAM_NODE_EQ,
+  AUDIO_STREAM_NODE_CRYSTALIZER,
+  AUDIO_STREAM_NODE_CHORUS,
+  AUDIO_STREAM_NODE_FLANGE,
+  AUDIO_STREAM_NODE_MAXIMIZER,
+  AUDIO_STREAM_NODE_PITCH_SHIFT,
+  /* Appended, never renumbered: a kind travels as an index in a built
+     patch, so inserting one above would silently re-point old data. */
   AUDIO_STREAM_NODE_AUDIO_OUT
 } AudioStreamNodeKind;
 
@@ -92,6 +128,8 @@ typedef struct {
   int modules;        /**< modules excluding Audio Out */
   int rendered;       /**< run with a real kernel */
   int passthrough;    /**< recognised position, no ported kernel */
+  int out_of_memory;  /**< ported kind whose kernel would not allocate */
+  int clamped;        /**< buffer too small for this sample rate */
   bool reached_output; /**< a source actually reaches Audio Out */
 } AudioStreamGraphReport;
 
@@ -102,6 +140,22 @@ enum { AUDIO_STREAM_FILTER_CUTOFF = 0, AUDIO_STREAM_FILTER_RESONANCE };
 enum { AUDIO_STREAM_DELAY_TIME = 0, AUDIO_STREAM_DELAY_FEEDBACK, AUDIO_STREAM_DELAY_WET };
 enum { AUDIO_STREAM_DIST_DRIVE = 0, AUDIO_STREAM_DIST_TONE, AUDIO_STREAM_DIST_WET };
 enum { AUDIO_STREAM_GAIN_GAIN = 0, AUDIO_STREAM_GAIN_MUTE };
+enum { AUDIO_STREAM_RING_CARRIER = 0, AUDIO_STREAM_RING_MIX };
+enum { AUDIO_STREAM_COMP_THRESHOLD = 0, AUDIO_STREAM_COMP_RATIO,
+       AUDIO_STREAM_COMP_ATTACK, AUDIO_STREAM_COMP_RELEASE };
+enum { AUDIO_STREAM_EQ_LOW = 0, AUDIO_STREAM_EQ_MID, AUDIO_STREAM_EQ_HIGH };
+enum { AUDIO_STREAM_CRYSTAL_CLARITY = 0, AUDIO_STREAM_CRYSTAL_FOCUS,
+       AUDIO_STREAM_CRYSTAL_SPARKLE, AUDIO_STREAM_CRYSTAL_SEPARATE,
+       AUDIO_STREAM_CRYSTAL_MIX };
+/* Chorus and flange are the same kernel with different bases, so they share
+   a slot layout. `base` is not a catalog param — the browser fixes it per
+   type (12 ms chorus, 4 ms flange) and so does this. */
+enum { AUDIO_STREAM_MOD_RATE = 0, AUDIO_STREAM_MOD_DEPTH,
+       AUDIO_STREAM_MOD_FEEDBACK, AUDIO_STREAM_MOD_WET };
+enum { AUDIO_STREAM_MAXIM_BOOST = 0, AUDIO_STREAM_MAXIM_CEILING,
+       AUDIO_STREAM_MAXIM_SOFT, AUDIO_STREAM_MAXIM_LOOKAHEAD,
+       AUDIO_STREAM_MAXIM_RELEASE, AUDIO_STREAM_MAXIM_OUTPUT };
+enum { AUDIO_STREAM_PITCH_PITCH = 0, AUDIO_STREAM_PITCH_MIX };
 
 /** How many param slots a kind actually owns. A slot past this is refused by
  *  setParam() rather than written into a gap nothing reads. */
